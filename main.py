@@ -20,6 +20,11 @@ from png_creator import create_static
 
 
 app_volumes = {}
+mute_exceptions = [  # apps that won't get muted when a-90 spawns
+    "python.exe",  # don't remove !!
+    "obs64.exe",
+    "Medal.exe"
+]
 
 def mute_audio():
     global app_volumes
@@ -32,7 +37,7 @@ def mute_audio():
         if process:
             app_name = process.name()
 
-            if app_name != "python.exe":  # we will only leave our a-90 app unmuted
+            if app_name not in mute_exceptions:  # we will only leave our a-90 app unmuted
                 app_volumes[app_name] = volume.GetMasterVolume()
                 volume.SetMasterVolume(0.0, None)
 
