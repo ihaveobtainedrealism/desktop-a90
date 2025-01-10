@@ -7,4 +7,4 @@ You may also press `Right Alt` to spawn it in manually
 Keep in mind that this is meant to be used on a 1920 x 1080 resolution screen only
 
 # Prerequisites
-`pip install pillow pygame pyautogui pydirectinput keyboard pygetwindow pycaw`
+`pip install pypng pillow pygame pyautogui pydirectinput keyboard pygetwindow pycaw`
