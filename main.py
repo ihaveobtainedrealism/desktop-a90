@@ -131,18 +131,21 @@ def initialize_static():
         index = 0
 
         while True:
-            if static_brightness == "Dark":
-                random_static = dark_static[index]
-            elif static_brightness == "Bright":
-                random_static = bright_static[index]
-            else:
-                random_static = ""
+            try:
+                if static_brightness == "Dark":
+                    random_static = dark_static[index]
+                elif static_brightness == "Bright":
+                    random_static = bright_static[index]
+                else:
+                    random_static = ""
 
-            static_image.configure(image=random_static)
+                static_image.configure(image=random_static)
 
-            index = (index + 1) % len(dark_static)
+                index = (index + 1) % len(dark_static)
 
-            sleep(0.025)
+                sleep(0.025)
+            except KeyboardInterrupt:
+                pass
 
     thread = Thread(target=update_static, daemon=True)
     thread.start()
@@ -348,13 +351,20 @@ def spawn_a90():
     static.after(0, create_a90)
 
 
+def app_exit():
+    pygame.quit()
+
+    static.quit()
+
+    print("Terminated")
+
 def key_functions(key):
     global static
 
     if key.name == "right alt":
         static.after(0, spawn_a90)
     elif key.name == "f4":
-        os._exit(0)
+        app_exit()
 
 
 keyboard.on_press(key_functions)
@@ -370,4 +380,7 @@ def random_spawn():
 
 static.after(0, random_spawn)
 
-static.mainloop()
+try:
+    static.mainloop()
+except KeyboardInterrupt:
+    app_exit()
