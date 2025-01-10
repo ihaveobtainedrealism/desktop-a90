@@ -10,11 +10,13 @@ listen_mouse = False
 
 
 def on_key_press(event):
-    if event.event_type == "down" and event.name not in pressed_keys:
-        pressed_keys.add(event.name)
+    key_name = event.name.lower().replace("'", "single_quote")
 
-    elif event.event_type == "up" and event.name in pressed_keys:
-        pressed_keys.remove(event.name)
+    if event.event_type == "down" and key_name not in pressed_keys:
+        pressed_keys.add(key_name)
+
+    elif event.event_type == "up" and key_name in pressed_keys:
+        pressed_keys.remove(key_name)
 
 keyboard.hook(on_key_press)
 
