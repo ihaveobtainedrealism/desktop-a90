@@ -366,8 +366,6 @@ def app_exit():
     print("Terminated")
 
 def key_functions(key):
-    global static
-
     if key.name == "right alt":
         static.after(0, spawn_a90)
     elif key.name == "f4":
