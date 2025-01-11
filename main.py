@@ -19,13 +19,17 @@ from pycaw.pycaw import AudioUtilities, ISimpleAudioVolume
 from png_creator import create_static
 
 
-app_volumes = {}
+reset_character = True  # if you get jumpscared while in a Roblox window, it'll reset your character
+mute_when_spawning = True  # temporarily mute all other apps whenever A-90 spawns (accurate !!)
+
 mute_exceptions = [  # apps that won't get muted when a-90 spawns
     "python.exe",  # don't remove !!
     "obs64.exe",
     "Medal.exe"
     # you can add more apps here if you need to
 ]
+
+app_volumes = {}
 
 def mute_audio():
     global app_volumes
@@ -169,7 +173,8 @@ def spawn_a90():
         global static_image
         global static_brightness
 
-        mute_audio()
+        if mute_when_spawning:
+            mute_audio()
 
         a_90 = tk.Toplevel(static)
         a_90.geometry(f"200x200+{random_x}+{random_y}")
@@ -290,12 +295,12 @@ def spawn_a90():
                 else:
                     static.after(100 * i, lambda: static_image.configure(bg="red"))
 
-                    current_window = pygetwindow.getActiveWindow()
-                    if current_window and current_window.title == "Roblox":
-                        # if you get jumpscared while you're in a roblox window, reset character :troll:
-                        pydirectinput.press("esc")
-                        pydirectinput.press("r")
-                        pydirectinput.press("enter")
+                    if reset_character:
+                        current_window = pygetwindow.getActiveWindow()
+                        if current_window and current_window.title == "Roblox":
+                            pydirectinput.press("esc")
+                            pydirectinput.press("r")
+                            pydirectinput.press("enter")
 
 
         def play_jumpscare():
@@ -345,7 +350,8 @@ def spawn_a90():
             static.withdraw()
             a_90.destroy()
 
-            restore_audio()
+            if mute_when_spawning:
+                restore_audio()
 
         static.after(500, move_to_center)
 
