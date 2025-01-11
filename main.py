@@ -24,6 +24,7 @@ mute_exceptions = [  # apps that won't get muted when a-90 spawns
     "python.exe",  # don't remove !!
     "obs64.exe",
     "Medal.exe"
+    # you can add more apps here if you need to
 ]
 
 def mute_audio():
@@ -145,7 +146,7 @@ def initialize_static():
 
                 sleep(0.025)
             except KeyboardInterrupt:
-                pass
+                app_exit()
 
     thread = Thread(target=update_static, daemon=True)
     thread.start()
