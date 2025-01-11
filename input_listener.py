@@ -10,7 +10,10 @@ listen_mouse = False
 
 
 def on_key_press(event):
-    key_name = event.name.lower().replace("'", "single_quote")
+    key_name = event.name.lower()
+
+    if not key_name.isalnum():
+        return
 
     if event.event_type == "down" and key_name not in pressed_keys:
         pressed_keys.add(key_name)
