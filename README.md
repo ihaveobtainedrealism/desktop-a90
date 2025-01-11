@@ -14,4 +14,4 @@ Keep in mind that this is meant to be used on a 1920 x 1080 resolution screen on
 Options can be edited in `main.py - line 22`
 
 - Reset Character: If you get caught by A-90 and you're focused in a Roblox window, you will automatically Reset Character (ON by default)
-- Mute Other Apps: Whenever A-90 spawns, all other applications will be muted (ON by default)
+- Mute Other Apps: Whenever A-90 spawns, all other applications will be temporarily muted (ON by default)
