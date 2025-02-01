@@ -42,9 +42,10 @@ def mute_audio():
         if process:
             app_name = process.name()
 
-            if any(app_name in i for i in mute_exceptions):  # we will only leave our a-90 app unmuted
-                app_volumes[app_name] = volume.GetMasterVolume()
-                volume.SetMasterVolume(0.0, None)
+            if not any(app in app_name for app in mute_exceptions):  # we will only leave our a-90 app unmuted
+                if volume.GetMasterVolume() != 0.0:
+                    app_volumes[app_name] = volume.GetMasterVolume()
+                    volume.SetMasterVolume(0.0, None)
 
 
 def restore_audio():
@@ -58,7 +59,7 @@ def restore_audio():
         if process:
             app_name = process.name()
 
-            if app_name in app_volumes and app_name != "python.exe":
+            if app_name in app_volumes and not any(app_name in i for i in mute_exceptions):
                 original_volume = app_volumes[app_name]
                 volume.SetMasterVolume(original_volume, None)
 
