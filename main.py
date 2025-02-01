@@ -23,9 +23,9 @@ reset_character = True  # if you get jumpscared while in a Roblox window, it'll 
 mute_when_spawning = True  # temporarily mute all other apps whenever A-90 spawns (accurate !!)
 
 mute_exceptions = [  # apps that won't get muted when a-90 spawns
-    "python.exe",  # don't remove !!
-    "obs64.exe",
-    "Medal.exe"
+    "python",  # don't remove !!
+    "obs64",
+    "Medal"
     # you can add more apps here if you need to
 ]
 
@@ -42,7 +42,7 @@ def mute_audio():
         if process:
             app_name = process.name()
 
-            if app_name not in mute_exceptions:  # we will only leave our a-90 app unmuted
+            if any(app_name in i for i in mute_exceptions):  # we will only leave our a-90 app unmuted
                 app_volumes[app_name] = volume.GetMasterVolume()
                 volume.SetMasterVolume(0.0, None)
 
