@@ -2,8 +2,7 @@
 After running `main.py`, A-90 will start randomly spawning every 30 - 120s
 
 You may also press `Right Alt` to spawn it in manually
-
-Keep in mind that this is meant to be used on a 1920 x 1080 resolution screen only
+Pressing 'F4' will terminate the program
 
 # Prerequisites
 `pip install pypng pillow pygame pyautogui pydirectinput keyboard pygetwindow pycaw`
