@@ -57,7 +57,7 @@ def restore_audio():
         process = session.Process
 
         if process:
-            app_name = process.name()
+            app_name = process.name().lower()
 
             if app_name in app_volumes and not any(app_name in i for i in mute_exceptions):
                 original_volume = app_volumes[app_name]
