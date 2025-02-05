@@ -24,8 +24,8 @@ mute_when_spawning = True  # temporarily mute all other apps whenever A-90 spawn
 
 mute_exceptions = [  # apps that won't get muted when a-90 spawns
     "python",  # don't remove !!
-    "obs64",
-    "Medal"
+    "obs",
+    "medal"
     # you can add more apps here if you need to
 ]
 
@@ -40,7 +40,7 @@ def mute_audio():
         process = session.Process
 
         if process:
-            app_name = process.name()
+            app_name = process.name().lower()
 
             if not any(app in app_name for app in mute_exceptions):  # we will only leave our a-90 app unmuted
                 if volume.GetMasterVolume() != 0.0:
@@ -71,8 +71,9 @@ pygame.init()
 pygame.mixer.init()
 
 screenshot = pyautogui.screenshot()
+res_x, res_y = screenshot.size
 
-resolution = screenshot.size
+scale_factor = ((res_x / 1920) + (res_y / 1080)) / 2
 
 idle_sprite = Image.open("Sprites/A-90_IDLE.png")
 block_sprite = Image.open("Sprites/A-90_BLOCK.png")
@@ -81,10 +82,12 @@ jumpscare_sprite = Image.open("Sprites/A-90_JUMPSCARE.png")
 jumpscare_active_sprite = Image.open("Sprites/A-90_JUMPSCARE_ACTIVE.png")
 
 static = tk.Tk()
-static.geometry(f"{resolution[0]}x{resolution[1]}")
+static.geometry(f"{res_x}x{res_y}")
 static.geometry("+0+0")
 static.resizable(False, False)
-static.attributes('-topmost', True)
+static.attributes("-topmost", True)
+static.attributes("-fullscreen", True)
+static.attributes("-disabled", True)
 static.configure(bg="black")
 static.overrideredirect(True)
 static["cursor"] = "none"
@@ -115,21 +118,43 @@ static_image = None
 def initialize_static():
     global static_image
 
+    downscale = max(1, round(5 * scale_factor))
+
     for i in range(1, 11):
         if not os.path.exists(f"Static/Dark/static{i}.png"):
-            create_static(f"Static/Dark/static{i}", 5, colors1)
+            print(f"Generating dark static{i}")
+            create_static(f"Static/Dark/static{i}", downscale, colors1)
+        else:
+            with Image.open(f"Static/Dark/static{i}.png") as img:
+                x, y = img.size
+
+                if x != res_x or y != res_y:
+                    print(f"Generating dark static{i}")
+
+                    create_static(f"Static/Dark/static{i}", downscale, colors1)
+
         image = Image.open(f'Static/Dark/static{i}.png')
         sprite = ImageTk.PhotoImage(image)
         dark_static.append(sprite)
 
     for i in range(1, 11):
         if not os.path.exists(f"Static/Bright/static{i}.png"):
-            create_static(f"Static/Bright/static{i}", 5, colors2)
+            print(f"Generating bright static{i}")
+            create_static(f"Static/Bright/static{i}", downscale, colors2)
+        else:
+            with Image.open(f"Static/Bright/static{i}.png") as img:
+                x, y = img.size
+
+                if x != res_x or y != res_y:
+                    print(f"Generating bright static{i}")
+
+                    create_static(f"Static/Bright/static{i}", downscale, colors2)
+
         image = Image.open(f'Static/Bright/static{i}.png')
         sprite = ImageTk.PhotoImage(image)
         bright_static.append(sprite)
 
-    static_image = tk.Label(static, width=resolution[0], height=resolution[1], image=dark_static[0])
+    static_image = tk.Label(static, width=res_x, height=res_y, image=dark_static[0])
     static_image.pack()
     static.withdraw()
 
@@ -163,12 +188,21 @@ warning = pygame.mixer.Sound("Audio/warning.mp3")
 warning.set_volume(0.5)
 
 jumpscare = pygame.mixer.Sound("Audio/jumpscare.ogg")
-jumpscare.set_volume(0.5)
+jumpscare.set_volume(0.5)  # feel free to adjust the volume
 
 
 def spawn_a90():
-    random_x = randint(0, resolution[0] - 240)
-    random_y = randint(0, resolution[1] - 240)
+    idle_width = int(res_x * 0.1042)
+    idle_height = int(res_y * 0.1852)
+
+    jumpscare_width = int(res_x * 0.3646)
+    jumpscare_height = int(res_y * 0.6481)
+
+    center_x = (res_x - idle_width) // 2
+    center_y = (res_y - idle_height) // 2
+
+    random_x = randint(0, res_x - 240)
+    random_y = randint(0, res_y - 240)
 
     def create_a90():
         global static_image
@@ -178,19 +212,28 @@ def spawn_a90():
             mute_audio()
 
         a_90 = tk.Toplevel(static)
-        a_90.geometry(f"200x200+{random_x}+{random_y}")
+        a_90.geometry(f"{idle_width}x{idle_height}+{random_x}+{random_y}")
         a_90.resizable(False, False)
         a_90.wm_attributes("-topmost", True)
         a_90.overrideredirect(True)
         a_90.configure()
         a_90.wm_attributes("-transparentcolor", a_90['bg'])
-        a_90["cursor"] = "none"
 
-        idle_photo = ImageTk.PhotoImage(idle_sprite)
-        block_photo = ImageTk.PhotoImage(block_sprite)
-        active_photo = ImageTk.PhotoImage(active_sprite)
-        jumpscare_photo = ImageTk.PhotoImage(jumpscare_sprite)
-        active_jumpscare_photo = ImageTk.PhotoImage(jumpscare_active_sprite)
+        idle_photo = ImageTk.PhotoImage(
+            idle_sprite.resize((idle_width, idle_height), Image.NEAREST)
+        )
+        block_photo = ImageTk.PhotoImage(
+            block_sprite.resize((idle_width, idle_height), Image.NEAREST)
+        )
+        active_photo = ImageTk.PhotoImage(
+            active_sprite.resize((idle_width, idle_height), Image.NEAREST)
+        )
+        jumpscare_photo = ImageTk.PhotoImage(
+            jumpscare_sprite.resize((jumpscare_width, jumpscare_height), Image.NEAREST)
+        )
+        active_jumpscare_photo = ImageTk.PhotoImage(
+            jumpscare_active_sprite.resize((jumpscare_width, jumpscare_height), Image.NEAREST)
+        )
 
         idle = tk.Label(a_90, bg=a_90['bg'], image=idle_photo, borderwidth=0, highlightthickness=0)
         idle.image = idle_photo
@@ -199,18 +242,11 @@ def spawn_a90():
         a_90.update()
         warning.play()
 
-        screen_width = resolution[0]
-        screen_height = resolution[1]
-        window_width = 200
-        window_height = 200
-        center_x = (screen_width - window_width) // 2
-        center_y = (screen_height - window_height) // 2
-
         static_brightness = "Dark"
 
 
         def move_to_center():
-            a_90.geometry(f"{window_width}x{window_height}+{center_x}+{center_y}")
+            a_90.geometry(f"{idle_width}x{idle_height}+{center_x}+{center_y}")
             static.deiconify()
             a_90.update()
             a_90.lift()
@@ -263,14 +299,11 @@ def spawn_a90():
 
 
         def shake_window():
-            shake_x = randint(-2, 2)
-            shake_y = randint(-2, 2)
+            shake_x = int(randint(-2, 2) * scale_factor)
+            shake_y = int(randint(-2, 2) * scale_factor)
 
-            window_width = 700
-            window_height = 700
-
-            center_x = (screen_width - window_width) // 2
-            center_y = (screen_height - window_height) // 2
+            center_x = (res_x - jumpscare_width) // 2
+            center_y = (res_y - jumpscare_height) // 2
 
             a_90.geometry(f"+{center_x + shake_x}+{center_y + shake_y}")
             a_90.update()
@@ -307,10 +340,7 @@ def spawn_a90():
         def play_jumpscare():
             jumpscare.play()
 
-            window_width = 700
-            window_height = 700
-
-            a_90.geometry(f"{window_width}x{window_height}")
+            a_90.geometry(f"{jumpscare_width}x{jumpscare_height}")
             a_90.update_idletasks()
 
             static.after(0, jumpscare_shake)

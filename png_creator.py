@@ -1,13 +1,18 @@
 from random import choice
 from PIL import Image
 
+from pyautogui import screenshot
+
 import png
 from PIL.Image import Resampling
 
+screenshot = screenshot()
+resolution = screenshot.size
+
 
 def create_static(name, downscale, colors):
-    width = round(1920 / downscale)
-    height = round(1080 / downscale)
+    width = round(resolution[0] / downscale)
+    height = round(resolution[1] / downscale)
 
     img = []
 
@@ -31,5 +36,5 @@ def create_static(name, downscale, colors):
             pass
 
     im = Image.open(f"{name}.png")
-    im_resized = im.resize((1920, 1080), Resampling.BOX)
+    im_resized = im.resize((resolution[0], resolution[1]), Resampling.BOX)
     im_resized.save(f"{name}.png", "PNG")
